@@ -4,9 +4,9 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using LeetCodeCom.Models.Configurations;
 
-namespace LeetCodeCom.Solutions;
-
 // https://leetcode.com/problems/move-zeroes/description/
+
+namespace LeetCodeCom.Solutions;
 
 [Config(typeof(BenchmarkConfiguration))]
 
@@ -20,7 +20,7 @@ namespace LeetCodeCom.Solutions;
 [HideColumns(Column.Error, Column.StdDev, Column.Median, Column.Job, Column.AllocRatio)]
 public class MoveZeroes
 {
-    [Params(1_000_000)]
+    [Params(100_000_000)]
     public int ItemsCount;
 
     public int[] nums_1;
@@ -29,15 +29,14 @@ public class MoveZeroes
     public int[] nums_4;
     public int[] nums_5;
     public int[] nums_6;
-    public int[] nums_7;
 
     [GlobalSetup]
     public void GlobalSetup()
     {
-        Random random = new(byte.MaxValue);
+        const int maxValue = 5;
+        Random random = new(maxValue);
 
-        const int maxValue = 2;
-        IEnumerable<int> numbers = Enumerable.Range(1, ItemsCount)
+        int[] numbers = Enumerable.Range(1, ItemsCount)
            .Select(_ => random.Next(maxValue))
            .ToArray();
 
@@ -47,39 +46,52 @@ public class MoveZeroes
         nums_4 = numbers.ToArray();
         nums_5 = numbers.ToArray();
         nums_6 = numbers.ToArray();
-        nums_7 = numbers.ToArray();
     }
 
     [Benchmark]
     public void Solution_1()
     {
-        int notZeroIndex = -1;
-
+        int index = -1;
         Span<int> items = nums_1.AsSpan();
 
-        int length = items.Length;
+        int length = items.Length - 1;
         for (int i = 0; i < length; i++)
         {
             int item = items[i];
-            if (item != 0)
+            if (item == 0)
             {
-                notZeroIndex++;
-                items[notZeroIndex] = item;
+                index = i;
+                break;
             }
         }
 
-        notZeroIndex++;
-
-        if (notZeroIndex != length)
+        if (index == -1)
         {
-            items[notZeroIndex..].Clear();
+            return;
+        }
+
+        Span<int> array = items[index..];
+
+        index = -1;
+
+        length = array.Length;
+        for (int i = 0; i < length; i++)
+        {
+            int item = array[i];
+            if (item != 0)
+            {
+                index++;
+
+                array[index] = item;
+                array[i] = 0;
+            }
         }
     }
 
     [Benchmark]
     public void Solution_2()
     {
-        int notZeroIndex = -1;
+        int index = -1;
 
         Span<int> items = nums_2.AsSpan();
 
@@ -87,42 +99,18 @@ public class MoveZeroes
         for (int i = 0; i < length; i++)
         {
             int item = items[i];
-            if (item == 0)
-            {
-                notZeroIndex = i;
-                break;
-            }
-        }
-
-        if (notZeroIndex == -1)
-        {
-            return;
-        }
-
-        Span<int> array = items[notZeroIndex..];
-
-        notZeroIndex = -1;
-
-        length = array.Length;
-        for (int i = 0; i < length; i++)
-        {
-            int item = array[i];
             if (item != 0)
             {
-                notZeroIndex++;
-
-                if (i != 0)
-                {
-                    array[notZeroIndex] = item;
-                }
+                index++;
+                items[index] = item;
             }
         }
 
-        notZeroIndex++;
+        index++;
 
-        if (notZeroIndex != length)
+        if (index != length)
         {
-            array[notZeroIndex..].Clear();
+            items[index..].Clear();
         }
     }
 
@@ -130,52 +118,9 @@ public class MoveZeroes
     public void Solution_3()
     {
         int notZeroIndex = -1;
-        Span<int> items = nums_3.AsSpan();
-
-        int length = items.Length;
-        for (int i = 0; i < length; i++)
-        {
-            int item = items[i];
-            if (item == 0)
-            {
-                notZeroIndex = i;
-                break;
-            }
-        }
-
-        if (notZeroIndex == -1)
-        {
-            return;
-        }
-
-        Span<int> array = items[notZeroIndex..];
-
-        notZeroIndex = -1;
-
-        length = array.Length;
-        for (int i = 0; i < length; i++)
-        {
-            int item = array[i];
-            if (item != 0)
-            {
-                notZeroIndex++;
-
-                if (i != 0)
-                {
-                    array[notZeroIndex] = item;
-                    array[i] = 0;
-                }
-            }
-        }
-    }
-
-    [Benchmark]
-    public void Solution_4()
-    {
-        int notZeroIndex = -1;
         int index = 0;
 
-        Span<int> items = nums_4.AsSpan();
+        Span<int> items = nums_3.AsSpan();
 
         int length = items.Length;
         while (index < length)
@@ -183,6 +128,7 @@ public class MoveZeroes
             if (items[index] != 0)
             {
                 notZeroIndex++;
+
                 items[notZeroIndex] = items[index];
             }
 
@@ -198,12 +144,12 @@ public class MoveZeroes
     }
 
     [Benchmark]
-    public void Solution_5()
+    public void Solution_4()
     {
         int notZeroIndex = 0;
         int index = 0;
 
-        Span<int> items = nums_5.AsSpan();
+        Span<int> items = nums_4.AsSpan();
 
         int length = items.Length;
         while (index < length)
@@ -211,6 +157,7 @@ public class MoveZeroes
             if (items[index] != 0)
             {
                 items[notZeroIndex] = items[index];
+
                 notZeroIndex++;
             }
 
@@ -224,44 +171,44 @@ public class MoveZeroes
     }
 
     [Benchmark]
-    public void Solution_6()
+    public void Solution_5()
     {
-        int notZeroCount = 0;
+        int index = 0;
 
-        int length = nums_6.Length;
+        int length = nums_5.Length;
         for (int i = 0; i < length; i++)
         {
-            if (nums_6[i] != 0)
+            if (nums_5[i] != 0)
             {
-                nums_6[notZeroCount++] = nums_6[i];
+                nums_5[index++] = nums_5[i];
             }
         }
 
-        while (notZeroCount < length)
+        while (index < length)
         {
-            nums_6[notZeroCount++] = 0;
+            nums_5[index++] = 0;
         }
     }
 
     [Benchmark]
-    public void Solution_7()
+    public void Solution_6()
     {
-        Span<int> items = nums_7.AsSpan();
-        
-        int notZeroCount = 0;
+        Span<int> items = nums_6.AsSpan();
+
+        int index = 0;
 
         int length = items.Length;
         for (int i = 0; i < length; i++)
         {
             if (items[i] != 0)
             {
-                items[notZeroCount++] = items[i];
+                items[index++] = items[i];
             }
         }
 
-        while (notZeroCount < length)
+        while (index < length)
         {
-            items[notZeroCount++] = 0;
+            items[index++] = 0;
         }
     }
 }

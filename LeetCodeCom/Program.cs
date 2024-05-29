@@ -14,7 +14,7 @@ internal static class Program
         Console.Title = $"[{Process.GetCurrentProcess().ProcessName}] ProcessId: {Environment.ProcessId} Path: {Environment.CurrentDirectory}";
 
         BenchmarkRunner.Run<MoveZeroes>();
-
+        
         Console.ReadLine();
     }
 }
