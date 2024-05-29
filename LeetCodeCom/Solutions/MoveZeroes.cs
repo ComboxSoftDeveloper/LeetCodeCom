@@ -107,20 +107,15 @@ public class MoveZeroes
         for (int i = 0; i < length; i++)
         {
             int item = array[i];
-            if (i == 0 && item != 0)
+            if (item != 0)
             {
                 notZeroIndex++;
-                continue;
+
+                if (i != 0)
+                {
+                    array[notZeroIndex] = item;
+                }
             }
-
-            if (item == 0)
-            {
-                continue;
-            }
-
-            notZeroIndex++;
-
-            array[notZeroIndex] = item;
         }
 
         notZeroIndex++;
@@ -161,21 +156,16 @@ public class MoveZeroes
         for (int i = 0; i < length; i++)
         {
             int item = array[i];
-            if (i == 0 && item != 0)
+            if (item != 0)
             {
                 notZeroIndex++;
-                continue;
+
+                if (i != 0)
+                {
+                    array[notZeroIndex] = item;
+                    array[i] = 0;
+                }
             }
-
-            if (item == 0)
-            {
-                continue;
-            }
-
-            notZeroIndex++;
-
-            array[notZeroIndex] = item;
-            array[i] = 0;
         }
     }
 
